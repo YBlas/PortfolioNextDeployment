@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { createRef, useState } from "react";
 import { useGetPhotosQuery } from "../generated/graphql";
 
 
@@ -39,9 +39,12 @@ const IndexPage: NextPage = () => {
     setSegment5(true);
   }, 4000);
 
+  const LayoutRef = createRef<HTMLDivElement>();
+
+
   return (
     <>
-      <Layout on={Segment5}>
+      <Layout on={Segment5} ref={LayoutRef}>
         <img className="title" src="name.png" />
         <Carrusel>
           {data &&
@@ -50,7 +53,7 @@ const IndexPage: NextPage = () => {
                 t?.internalId === photo?.internalId
               ))
             ).map((photo, index) => (
-              <CarrouselImage onClick={()=>{router.push(photo?.internalId as string)}} url={photo!.url}>
+              <CarrouselImage onClick={() => { router.push(photo?.internalId as string) }} url={photo!.url}>
                 <h1>
                   {photo?.internalId}
                 </h1>
@@ -58,6 +61,20 @@ const IndexPage: NextPage = () => {
             ))
           }
         </Carrusel>
+        {(typeof window !== 'undefined') && window.innerWidth > 1000 && (
+          <>
+            <ButtonScroll right onClick={() => {
+              LayoutRef.current?.scrollBy({ left: 1000, behavior: 'smooth' });
+            }}>
+              <img src="arrow.svg" />
+            </ButtonScroll>
+            <ButtonScroll onClick={() => {
+              LayoutRef.current?.scrollBy({ left: -1000, behavior: 'smooth' });
+            }}>
+              <img src="arrow.svg" />
+            </ButtonScroll>
+          </>
+        )}
       </Layout>
       <Background move4={Segment4} />
       <Blue move={Segment} move2={Segment2} move3={Segment3} move4={Segment4} />
@@ -141,6 +158,11 @@ const CarrouselImage = styled.div<{ url: string }>`
       margin: 150px 0 0 20px;
       font-size: 1rem;
     }
+    @media (min-width: 1000px) {
+        @media (max-width: 1500px) {
+          margin: 350px 0 0 50px;
+        }
+      }
   }
   :hover {
     box-shadow: 0 0 20px 0 rgba(0,0,0,0.5);
@@ -154,7 +176,12 @@ const CarrouselImage = styled.div<{ url: string }>`
       @media (max-width: 1000px) {
       margin: 150px 0 0 20px;
       font-size: 1.2rem;
-    }
+      }
+      @media (min-width: 1000px) {
+        @media (max-width: 1500px) {
+          margin: 350px 0 0 60px;
+        }
+      }
     }
   }
   transition: all 0.5s;
@@ -162,6 +189,12 @@ const CarrouselImage = styled.div<{ url: string }>`
     width: 300px;
     height: 200px;
     margin: 40px 0;
+  }
+  @media (min-width: 1000px) {
+    @media (max-width: 1500px) {
+      width: 800px;
+      height: 500px;
+    }
   }
 `
 
@@ -224,4 +257,33 @@ const Red = styled.div<{ move: boolean, move2: boolean, move3: boolean, move4: b
   ${props => props.move3 ? 'width: 60vw;' : 'width: 10vw;'}
   ${props => props.move2 ? 'height: 100%;' : 'height: 5vh;'}
   transition: left 1.5s, height 1s, width 0.5s, top 0.8s;
+`
+
+const ButtonScroll = styled.button<{ right?: boolean }>`
+  position: fixed;
+  top: 50%;
+
+  ${props => props.right && 'right: 30px;' || 'left: 70px;'}
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+  transition: all 0.5s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  :hover {
+    width: 55px;
+    height: 55px;
+    box-shadow: 0 0 20px 0 rgba(0,0,0,0.5);
+    cursor: pointer;
+  }
+  img {
+    width: 30px;
+    height: 30px;
+    ${props => props.right ? 'transform: rotate(180deg);' : ''}
+  }
 `
