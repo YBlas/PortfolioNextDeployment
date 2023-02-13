@@ -52,7 +52,7 @@ const IndexPage: NextPage = () => {
               index === self.findIndex((t) => (
                 t?.internalId === photo?.internalId
               ))
-            ).reverse().slice(0, 10).map((photo, index) => (
+            ).map((photo, index) => (
               <CarrouselImage onClick={() => { router.push(photo?.internalId as string) }} url={photo!.url}>
                 <h1>
                   {photo?.internalId}
